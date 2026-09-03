@@ -32,7 +32,7 @@ export default function JacketsPage() {
           <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {products.map((p) => (
               <Link key={p.id} href="/shop" className="group block">
-                <div className="aspect-[4/5] rounded-lg bg-secondary border border-border flex items-center justify-center"><ShoppingBag className="h-8 w-8 opacity-20" /></div>
+                <div className="aspect-4/5 rounded-lg bg-secondary border border-border flex items-center justify-center"><ShoppingBag className="h-8 w-8 opacity-20" /></div>
                 <h3 className="mt-3 font-medium group-hover:text-primary">{p.title}</h3>
                 <p className="text-sm text-muted-foreground">{p.wash_details}</p>
                 <p className="font-medium mt-1">{formatPrice(Number(p.base_price))}</p>

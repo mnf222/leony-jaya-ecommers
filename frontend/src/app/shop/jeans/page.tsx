@@ -35,7 +35,7 @@ export default function JeansPage() {
           <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {products.map((p) => (
               <Link key={p.id} href={`/shop`} className="group block">
-                <div className="aspect-[3/4] rounded-lg bg-secondary border border-border flex items-center justify-center"><ShoppingBag className="h-8 w-8 opacity-20" /></div>
+                <div className="aspect-3/4 rounded-lg bg-secondary border border-border flex items-center justify-center"><ShoppingBag className="h-8 w-8 opacity-20" /></div>
                 <h3 className="mt-3 font-medium group-hover:text-primary">{p.title}</h3>
                 <p className="text-sm text-muted-foreground">{p.denim_weight}</p>
                 <p className="font-medium mt-1">{formatPrice(Number(p.base_price))}</p>

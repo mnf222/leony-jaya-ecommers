@@ -31,7 +31,7 @@ export default function ContactPage() {
           <div className="space-y-6">
             <div className="rounded-xl bg-secondary/30 border border-border p-6">
               <h3 className="font-medium">WhatsApp</h3>
-              <p className="text-sm text-muted-foreground mt-1">+62 812-3456-7890 (09:00-18:00 WIB)</p>
+              <p className="text-sm text-muted-foreground mt-1">+62 859-2239-3949 (09:00-18:00 WIB)</p>
             </div>
             <div className="rounded-xl bg-secondary/30 border border-border p-6">
               <h3 className="font-medium">Email</h3>
@@ -39,7 +39,7 @@ export default function ContactPage() {
             </div>
             <div className="rounded-xl bg-secondary/30 border border-border p-6">
               <h3 className="font-medium">Studio</h3>
-              <p className="text-sm text-muted-foreground mt-1">Jl. Denim No. 88, Bandung — by appointment only</p>
+              <p className="text-sm text-muted-foreground mt-1"> Kp.Bojonglaja Rt/Rw 02/16, Bandung — by appointment only</p>
             </div>
           </div>
         </div>
