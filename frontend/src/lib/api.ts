@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api/v1";
 
 class ApiClient {
   private baseUrl: string;
@@ -174,4 +174,58 @@ export interface CreateOrderData {
   user_phone: string;
   shipping_address: string;
   items: Array<{ variant_id: number; quantity: number }>;
+}
+
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  phone: string | null;
+  avatar: string | null;
+  email_verified_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AuthResponse {
+  user: User;
+  token: string;
+  message: string;
+}
+
+export interface RegisterData {
+  name: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
+  phone?: string;
+}
+
+export interface LoginData {
+  email: string;
+  password: string;
+  remember?: boolean;
+}
+
+export interface ForgotPasswordData {
+  email: string;
+}
+
+export interface ResetPasswordData {
+  token: string;
+  email: string;
+  password: string;
+  password_confirmation: string;
+}
+
+export interface UpdateProfileData {
+  name?: string;
+  phone?: string;
+  avatar?: string;
+}
+
+export interface UpdatePasswordData {
+  current_password: string;
+  password: string;
+  password_confirmation: string;
 }
