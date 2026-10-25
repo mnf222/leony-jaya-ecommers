@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { placeOrder } from '../supabase';
 import { useAuth, useCart } from '../store';
 import { rupiah, translateError } from '../utils';
+import PaymentInstructions from '../components/PaymentInstructions';
 
 export default function Cart() {
   const items = useCart((state) => state.items);
@@ -15,18 +16,35 @@ export default function Cart() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [order, setOrder] = useState(null);
+  const [shipping, setShipping] = useState({
+    name: user?.user_metadata?.full_name || '',
+    phone: '',
+    address: '',
+  });
+  const setField = (field) => (e) => setShipping((s) => ({ ...s, [field]: e.target.value }));
 
   const total = items.reduce((n, i) => n + i.price * i.quantity, 0);
 
   const checkout = async () => {
     if (!user) return navigate('/login', { state: { from: '/cart' } });
+
+    const details = {
+      name: shipping.name.trim(),
+      phone: shipping.phone.trim(),
+      address: shipping.address.trim(),
+    };
+    if (details.name.length < 2) return setError('Please enter your full name.');
+    if (!/^\+?[0-9][0-9 -]{7,18}$/.test(details.phone)) return setError('Please enter a valid phone number.');
+    if (details.address.length < 10) return setError('Please enter your full shipping address.');
+
     setBusy(true); setError('');
     try {
       const result = await placeOrder(
         payment,
-        items.map((i) => ({ product_id: i.product_id, quantity: i.quantity, size: i.size }))
+        items.map((i) => ({ product_id: i.product_id, quantity: i.quantity, size: i.size })),
+        details
       );
-      setOrder(result);
+      setOrder({ ...result, payment_method: payment });
       clear();
     } catch (e) {
       setError(translateError(e.message));
@@ -42,9 +60,18 @@ export default function Cart() {
         <p className="mt-4 text-neutral-400">
           Order #{order.id} &middot; {rupiah(order.total_price)} &middot; status: {order.status}
         </p>
-        <Link to="/" className="mt-8 inline-block border border-white px-8 py-3 text-xs uppercase tracking-widest hover:bg-white hover:text-ink">
-          Continue shopping
-        </Link>
+        <div className="mx-auto mt-8 max-w-sm border border-white/10 bg-[#111] p-5 text-left">
+          <p className="mb-3 text-[9px] uppercase tracking-[0.17em] text-neutral-500">How to pay</p>
+          <PaymentInstructions method={order.payment_method} deadline={order.expires_at} />
+        </div>
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <Link to="/orders" className="inline-block bg-white px-8 py-3 text-xs font-semibold uppercase tracking-widest text-ink hover:bg-neutral-200">
+            My orders
+          </Link>
+          <Link to="/" className="inline-block border border-white px-8 py-3 text-xs uppercase tracking-widest hover:bg-white hover:text-ink">
+            Continue shopping
+          </Link>
+        </div>
       </div>
     );
   }
@@ -99,6 +126,16 @@ export default function Cart() {
           <span className="font-display text-2xl font-semibold">{rupiah(total)}</span>
         </div>
         <p className="mt-2 text-[10px] leading-5 text-neutral-600">Final stock and prices are confirmed securely when your order is placed.</p>
+
+        <p className="mt-7 text-[9px] uppercase tracking-[0.17em] text-neutral-500">Shipping details</p>
+        <div className="mt-2 grid gap-3">
+          <input value={shipping.name} onChange={setField('name')} placeholder="Full name" autoComplete="name" maxLength={100}
+            className="w-full border border-white/15 bg-ink px-4 py-3.5 text-xs outline-none transition focus:border-white" />
+          <input value={shipping.phone} onChange={setField('phone')} placeholder="Phone / WhatsApp (e.g. 0812…)" autoComplete="tel" inputMode="tel" maxLength={20}
+            className="w-full border border-white/15 bg-ink px-4 py-3.5 text-xs outline-none transition focus:border-white" />
+          <textarea value={shipping.address} onChange={setField('address')} placeholder="Full address (street, district, city, province, postal code)" autoComplete="street-address" rows={3} maxLength={500}
+            className="w-full resize-none border border-white/15 bg-ink px-4 py-3.5 text-xs outline-none transition focus:border-white" />
+        </div>
 
         <label className="mt-7 block text-[9px] uppercase tracking-[0.17em] text-neutral-500">Payment method</label>
         <select value={payment} onChange={(e) => setPayment(e.target.value)}

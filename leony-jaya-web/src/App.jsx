@@ -4,8 +4,11 @@ import Home from './pages/Home.jsx';
 import Product from './pages/Product.jsx';
 import Cart from './pages/Cart.jsx';
 import Login from './pages/Login.jsx';
+import Orders from './pages/Orders.jsx';
+import Admin from './pages/Admin.jsx';
+import AdminRoute from './components/AdminRoute.jsx';
 import { useAuth, useCart } from './store';
-import { requireSupabase, supabase } from './supabase';
+import { getIsAdmin, requireSupabase, supabase } from './supabase';
 import { translateError } from './utils';
 
 function Navbar() {
@@ -13,6 +16,14 @@ function Navbar() {
   const user = useAuth((s) => s.user);
   const logout = useAuth((s) => s.logout);
   const [error, setError] = useState('');
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    setIsAdmin(false);
+    if (user?.id) getIsAdmin(user.id).then((admin) => active && setIsAdmin(admin));
+    return () => { active = false; };
+  }, [user?.id]);
 
   const handleLogout = async () => {
     try {
@@ -45,6 +56,16 @@ function Navbar() {
               Collection
             </NavLink>
             <a href="/#story" className="text-neutral-500 transition hover:text-white">Our point of view</a>
+            {user && (
+              <NavLink to="/orders" className={({ isActive }) => `transition hover:text-white ${isActive ? 'text-white' : 'text-neutral-500'}`}>
+                My orders
+              </NavLink>
+            )}
+            {isAdmin && (
+              <NavLink to="/admin" className={({ isActive }) => `transition hover:text-white ${isActive ? 'text-white' : 'text-amber-400'}`}>
+                Admin
+              </NavLink>
+            )}
           </div>
           <div className="flex items-center gap-2 sm:gap-4">
             {user ? (
@@ -176,6 +197,8 @@ export default function App() {
           <Route path="/product/:slug" element={<Product />} />
           <Route path="/cart" element={<Cart />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/admin" element={<AdminRoute><Admin /></AdminRoute>} />
           <Route
             path="*"
             element={<p className="p-20 text-center text-neutral-500">Page not found.</p>}

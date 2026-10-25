@@ -19,12 +19,25 @@ export function translateError(message) {
     'Each item requires a valid product_id, quantity, and size.': 'The order item details are invalid.',
     'An order must contain between 1 and 50 items.': 'An order must contain between 1 and 50 items.',
     'permission denied for function checkout_order': 'Checkout is not enabled yet. Please contact customer service.',
+    'Shipping details are required.': 'Please fill in your shipping details.',
+    'Shipping details are invalid.': 'Please enter a valid name, phone number and full address.',
+    'You can order at most 20 of one item.': 'You can order at most 20 of one item.',
+    'Only pending orders can be cancelled.': 'Only orders that are still pending can be cancelled.',
+    'Order not found.': 'We could not find that order.',
+    'This order does not need a payment proof.': 'This order does not need a payment proof.',
+    'Proof file was not uploaded.': 'The payment proof was not uploaded. Please try again.',
   };
   const exactMatch = exactTranslations[message];
   if (exactMatch) return exactMatch;
 
-  const insufficientStock = message.match(/^Insufficient stock for (.+)\.?$/i);
+  const insufficientStock = message.match(/^Insufficient stock for (.+?)\.?$/i);
   if (insufficientStock) return `There is not enough stock for ${insufficientStock[1]}.`;
+
+  const sizeMissing = message.match(/^Size (.+) is not available for (.+?)\.?$/i);
+  if (sizeMissing) return `Size ${sizeMissing[1]} is not available for ${sizeMissing[2]}.`;
+
+  // Messages we raise ourselves in the browser are already user-friendly.
+  if (/^(Only JPG|The image must|Please choose|The order was not updated)/.test(message)) return message;
 
   if (message.startsWith('A product in this order is unavailable')) {
     return 'A product in this order is no longer available.';

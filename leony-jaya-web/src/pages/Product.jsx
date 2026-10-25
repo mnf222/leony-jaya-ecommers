@@ -25,7 +25,11 @@ export default function Product() {
 
   // Dynamic accent: everything below is driven by the API's article_color.
   const accent = p.article_color;
-  const sizes = parseSizes(p.size_guide);
+  // Per-size stock from product_variants; falls back to the size guide if no variants exist yet.
+  const sizes = p.variants.length
+    ? p.variants.map((v) => ({ size: v.size, stock: v.stock }))
+    : parseSizes(p.size_guide).map((s) => ({ size: s, stock: p.stock }));
+  const selectedStock = sizes.find((x) => x.size === size)?.stock ?? null;
   const soldOut = p.stock <= 0;
   const images = p.images.length ? p.images : [{ id: 0, image_url: p.primary_image }];
   const showImage = (index) => setImg((index + images.length) % images.length);
@@ -97,9 +101,9 @@ export default function Product() {
           <a href="#size-guide" className="text-[9px] uppercase tracking-[0.14em] text-neutral-500 underline underline-offset-4 transition hover:text-white">Size guide</a>
         </div>
         <div className="mt-3 flex flex-wrap gap-2">
-          {sizes.map((s) => (
-            <button key={s} onClick={() => { setSize(s); setError(''); }} aria-pressed={size === s}
-              className="min-w-[3.5rem] border px-4 py-3 text-xs transition hover:scale-[1.03]"
+          {sizes.map(({ size: s, stock }) => (
+            <button key={s} disabled={stock <= 0} onClick={() => { setSize(s); setError(''); }} aria-pressed={size === s}
+              className="min-w-[3.5rem] border px-4 py-3 text-xs transition hover:scale-[1.03] disabled:cursor-not-allowed disabled:line-through disabled:opacity-40 disabled:hover:scale-100"
               style={size === s
                 ? { borderColor: accent, color: accent, boxShadow: `0 0 12px ${accent}66` }
                 : { borderColor: '#2A2A2A', color: '#A3A3A3' }}>
@@ -107,6 +111,9 @@ export default function Product() {
             </button>
           ))}
         </div>
+        {selectedStock !== null && selectedStock > 0 && selectedStock <= 3 && (
+          <p className="mt-3 text-[10px] uppercase tracking-[0.14em] text-amber-400">Only {selectedStock} left in size {size}</p>
+        )}
 
         <button
           onClick={handleAdd}
