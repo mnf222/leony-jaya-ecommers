@@ -14,6 +14,10 @@ cd leony-jaya-web
 npm install
 copy .env.example .env
 ```
+## Admin
+Email: Nazrilfahrezi333@gmail.com
+password : Admin1223
+```
 
 Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` in `.env` from
 Supabase **Project Settings → API Keys**, then apply
